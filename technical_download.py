@@ -11,9 +11,6 @@ import numpy as np
 import threading
 import timeit
 
-#start timer
-start = timeit.default_timer()
-
 #declare global lock object
 global lock
 lock = threading.Lock()
@@ -76,29 +73,31 @@ def symbol_downloader(symbol, directory, days=10000, days_ago=0):
     except Exception as ex:
         pass
 
-#start timer
-start = timeit.default_timer()
+if __name__ == '__main__':
 
-symbolslist = open('symbols_alt.txt').read().split('\n')
+    #start timer
+    start = timeit.default_timer()
 
-directory = './data_nasdaq/'
+    symbolslist = open('symbols_alt.txt').read().split('\n')
 
-threadlist = []
+    directory = './data_nasdaq/'
 
-for u in symbolslist:
+    threadlist = []
 
-    t = threading.Thread(target = symbol_downloader,args=(u,directory))
-    t.start()
-    threadlist.append(t)
-    #sets top limit of active threads to 50
-    while threading.activeCount()>50:
-        a=0
-    #print threading.activeCount()
+    for u in symbolslist:
 
-for b in threadlist:
-    b.join()
-print ("# of threads: ", len(threadlist))
+        t = threading.Thread(target = symbol_downloader,args=(u,directory))
+        t.start()
+        threadlist.append(t)
+        #sets top limit of active threads to 50
+        while threading.activeCount()>50:
+            a=0
+        #print threading.activeCount()
 
-#timer
-stop = timeit.default_timer()
-print ("seconds of operation: " , stop - start)
+    for b in threadlist:
+        b.join()
+    print ("# of threads: ", len(threadlist))
+
+    #timer
+    stop = timeit.default_timer()
+    print ("seconds of operation: " , stop - start)
