@@ -19,9 +19,6 @@ from time import sleep
 import threading
 import timeit
 
-#start timer
-start = timeit.default_timer()
-
 #declare global lock object
 global lock
 lock = threading.Lock()
@@ -79,4 +76,8 @@ def nasdaq_ticker_downloader():
         except:
             pass
         
-   
+if __name__ == '__main__':
+    #start timer
+    start = timeit.default_timer()
+    
+    nasdaq_ticker_downloader()
