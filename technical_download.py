@@ -97,6 +97,21 @@ if __name__ == '__main__':
     for b in threadlist:
         b.join()
     print ("# of threads: ", len(threadlist))
+    
+    directory = './data_nasdaq/'
+    # get list with filenames in folder and throw away all non ncsv
+    files = [f for f in os.listdir(directory) if f.endswith('.csv')]
+    
+    for f in files:
+        try:
+            stock_df = pd.read_csv(os.path.join(directory, f))
+
+            if float(stock_df.tail(1)['close']) >= 1.1 and float(stock_df.tail(1)['volume']) >= 1 and float(stock_df.tail(1)['sma']) <= 20 and float(stock_df.tail(1)['sma']) >= 2:
+
+                print ('{} has high price and volume movement on {}, and is under $10'.format(f,stock_df.index[-1]))
+
+        except: 
+            pass
 
     #timer
     stop = timeit.default_timer()
