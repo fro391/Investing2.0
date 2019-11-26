@@ -97,11 +97,11 @@ if __name__ == '__main__':
     for b in threadlist:
         b.join()
     print ("# of threads: ", len(threadlist))
-    
+
+    #Analyze
     directory = './data_nasdaq/'
     # get list with filenames in folder and throw away all non ncsv
     files = [f for f in os.listdir(directory) if f.endswith('.csv')]
-    
     for f in files:
         try:
             stock_df = pd.read_csv(os.path.join(directory, f))

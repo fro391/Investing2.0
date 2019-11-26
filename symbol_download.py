@@ -48,11 +48,11 @@ def nasdaq_ticker_downloader():
             resp = requests.get(url, headers=hdr)
             if resp.status_code != 200:
                 # This means something went wrong.
-                raise ApiError('GET /tasks/ {}'.format(resp.status_code))
+                pass
             data = json.loads(resp.text)
 
             #add new symbols to old list
-            with open('symbols_alt.txt','r') as symbolfile:
+            with open('symbols.txt','r') as symbolfile:
                 symbolslist = symbolfile.read().split('\n')
             len1 = len(symbolslist)
             for j in range(49):
@@ -101,7 +101,7 @@ def nasdaq_ticker_analyzer():
             resp = requests.get(url, headers=hdr)
             if resp.status_code != 200:
                 # This means something went wrong.
-                raise ApiError('GET /tasks/ {}'.format(resp.status_code))
+                pass
             data = json.loads(resp.text)
             for j in range(19):
                 try:
@@ -132,6 +132,6 @@ def nasdaq_ticker_analyzer():
 if __name__ == '__main__':
     #start timer
     start = timeit.default_timer()
-    nasdaq_ticker_downloader()
+    #nasdaq_ticker_downloader()
     nasdaq_ticker_analyzer()
     
