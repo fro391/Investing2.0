@@ -64,7 +64,7 @@ def nasdaq_ticker_downloader():
                     pass
             len2 = len(symbolslist)
 
-            with open ('symbols.txt','w+') as symbolfile:             #write to old file
+            with open ('symbols_nasdaq.txt','w+') as symbolfile:             #write to old file
                 counter = 0 #counter for not adding '\n' at the last line
                 for s in symbolslist:
                     counter += 1
@@ -132,6 +132,6 @@ def nasdaq_ticker_analyzer():
 if __name__ == '__main__':
     #start timer
     start = timeit.default_timer()
-    #nasdaq_ticker_downloader()
-    nasdaq_ticker_analyzer()
+    nasdaq_ticker_downloader()
+    #nasdaq_ticker_analyzer()
     
