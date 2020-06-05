@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(4): #engulfing candel pattern looping through all available data 
+            for i in range(2): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
