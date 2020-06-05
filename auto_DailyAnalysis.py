@@ -21,7 +21,7 @@ import sys
 global lock
 lock = threading.Lock()
 
-def symbol_downloader(symbol, directory, days=600, days_ago=0):
+def symbol_downloader(symbol, directory, days=400, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     gc.collect()
     to_send = ''
     to_save = '^DJI\n'
-    directory = './data_test/'
+    directory = './data_nasdaq/'
     # get list with filenames in folder and throw away all non ncsv
     files = [f for f in os.listdir(directory) if f.endswith('.csv')]
     for f in files:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(int((len(stock_df)*0.5))): #engulfing candel pattern looping through all available data 
+            for i in range(20): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -191,7 +191,6 @@ if __name__ == '__main__':
                 #core buy-in logic
                 if  stockPChange > abs(jonesPChange)*3\
                     and openTday < closeTday \
-                    and closeTday > sma5 and closeYday < sma5_1\
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
                     and closeTday > sma89 \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\

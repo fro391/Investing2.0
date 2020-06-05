@@ -61,6 +61,7 @@ def symbol_downloader_intraday (symbol, directory, days=30, days_ago=0):
         stock_df['sma5'] = stock_df['close'].rolling(window=5).mean()
         stock_df['sma8'] = stock_df['close'].rolling(window=8).mean()
         stock_df['sma13'] = stock_df['close'].rolling(window=13).mean()
+        stock_df['sma21'] = stock_df['close'].rolling(window=21).mean()
         stock_df = stock_df.dropna()
 
         #stock_df.drop(['close', 'high', 'low', 'open','volume','sma','vol20'], axis=1, inplace=True)
@@ -125,7 +126,7 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(int((len(stock_df)*0.3))): #engulfing candel pattern looping through all available data 
+            for i in range(4): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -136,35 +137,60 @@ if __name__ == '__main__':
                 open_1 = float(stock_df['open_x'].iloc[-(i+1)])
                 close_1 = float(stock_df['close_x'].iloc[-(i+1)])
 
+                #Moving averages
                 sma5 = float(stock_df['sma5_x'].iloc[-i])
                 sma8 = float(stock_df['sma8_x'].iloc[-i])
                 sma13 = float(stock_df['sma13_x'].iloc[-i])
+                sma21 = float(stock_df['sma21_x'].iloc[-i])
 
+                sma5_1 = float(stock_df['sma5_x'].iloc[-(i+1)])
+                sma8_1 = float(stock_df['sma8_x'].iloc[-(i+1)])
+                sma13_1 = float(stock_df['sma13_x'].iloc[-(i+1)])
+                sma21_1 = float(stock_df['sma21_x'].iloc[-(i+1)])
+
+                sma5_2 = float(stock_df['sma5_x'].iloc[-(i+2)])
+                sma8_2 = float(stock_df['sma8_x'].iloc[-(i+2)])
+                sma13_2 = float(stock_df['sma13_x'].iloc[-(i+2)])
+                sma21_2 = float(stock_df['sma21_x'].iloc[-(i+2)])  
+
+                #moving average momentum indicators
+                s5 =  ((sma5-sma5_1)/sma5)*1000
+                s8 =  ((sma8-sma8_1)/sma8)*1000
+                s13 =  ((sma13-sma13_1)/sma13)*1000
+                s21 =  ((sma21-sma21_1)/sma21)*1000
+
+                z5 =  ((sma5_1-sma5_2)/sma5_1)*1000
+                z8 =  ((sma8_1-sma8_2)/sma8_1)*1000
+                z13 =  ((sma13_1-sma13_2)/sma13_1)*1000
+                z21 =  ((sma21_1-sma21_2)/sma21_1)*1000
+
+                #volume indicators
                 mktVlcty0 = float(stock_df['volume_x'].iloc[-i])*float(stock_df['close_x'].iloc[-i])
 
                 volume0 = (float(stock_df['volume_x'].iloc[-i])+0.001)/(float(stock_df['vol20_x'].iloc[-i])+0.001)
 
+                #market indexes
                 j_open0 =  float(stock_df['open_y'].iloc[-i])
                 j_close0 =  float(stock_df['close_y'].iloc[-i])
                 stockPChange = (close0-open0)/open0 
                 jonesPChange = (j_close0-j_open0)/j_open0
 
+                #time of day
                 timeOfDay = stock_df['Unnamed: 0_x'].iloc[-i][-4:]
                 date0 = stock_df['Unnamed: 0_x'].iloc[-i][:8]
                 tday_date = str(datetime.datetime.today().strftime('%Y%m%d'))
 
                 #core logic
                 if  stockPChange > abs(jonesPChange)*10\
-                    and sma5<close0 \
-                    and sma5> open0 \
-                    and sma5 > sma8 and sma8 > sma13 \
-                    and close0 <= 20 and close0 >= 0.5 \
+                    and open0 < close0 \
+                    and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+                    and close0 <= 5 and close0 >= 0.5 \
                     and mktVlcty0 > 100000\
                     and volume0 >= 2\
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m buy-in signal with high volume on {}, and is under $20. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m buy-in signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
         except IndexError:
             print("{} has too few rows".format(f))
@@ -173,7 +199,6 @@ if __name__ == '__main__':
             print(traceback.format_exc())
             # or
             print(sys.exc_info()[2])
-            pass
 
 #Send email if there are buy-in signals
     if len(to_send) > 0:
