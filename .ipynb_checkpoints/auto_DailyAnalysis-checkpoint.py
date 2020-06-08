@@ -17,11 +17,12 @@ import smtplib
 import gc
 import sys
 
+import re
+
 #declare global lock object
 global lock
 lock = threading.Lock()
-
-def symbol_downloader(symbol, directory, days=400, days_ago=0):
+def symbol_downloader(symbol, directory, days=600, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
@@ -130,7 +131,11 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(20): #engulfing candel pattern looping through all available data 
+            #Today's closing price and 13 day moving average
+            closeTdayAct =  float(stock_df['close_x'].iloc[-1])
+            sma13Act = float(stock_df['sma13_x'].iloc[-1])
+
+            for i in range(7): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -189,7 +194,8 @@ if __name__ == '__main__':
                 jonesPChange = (j_close0-j_open0)/j_open0
 
                 #core buy-in logic
-                if  stockPChange > abs(jonesPChange)*3\
+                if  closeTdayAct > sma13Act\
+                    and stockPChange > abs(jonesPChange)*3\
                     and openTday < closeTday \
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
                     and closeTday > sma89 \
@@ -203,7 +209,8 @@ if __name__ == '__main__':
                     to_send += '{} has uncle"s pattern with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))
 
                 #MACD logic
-                if  openTday < closeTday \
+                if  closeTdayAct > sma13Act\
+                    and openTday < closeTday \
                     and MACD_1 < MACD_signal_1 and MACD > MACD_signal \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
@@ -224,10 +231,14 @@ if __name__ == '__main__':
             # or
             print(sys.exc_info()[2])
             pass
-
 #replace intraday symbols file
     save_list = to_save.split('\n')
+
     save_list = list(set(save_list)) #remove duplicates
+
+    reg=re.compile('^[a-zA-Z]+$') #only take symbols with alphabets 
+    save_list = [s for s in save_list if reg.match(s)]
+
     to_save = ''
     for i in save_list:
         to_save += '{}\n'.format(i)
