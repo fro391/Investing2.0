@@ -92,6 +92,12 @@ def symbol_downloader(symbol, directory, days=600, days_ago=0):
         raise SystemExit(e)
         
 if __name__ == '__main__':
+    
+    #Delete files in Directory
+    directory = './data_nasdaq/'
+    filelist = [ f for f in os.listdir(directory) if f.endswith(".csv") ]
+    for f in filelist:
+        os.remove(os.path.join(directory, f))
 
     #start timer
     start = timeit.default_timer()
@@ -135,7 +141,7 @@ if __name__ == '__main__':
             closeTdayAct =  float(stock_df['close_x'].iloc[-1])
             sma13Act = float(stock_df['sma13_x'].iloc[-1])
 
-            for i in range(7): #engulfing candel pattern looping through all available data 
+            for i in range(3): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -238,6 +244,8 @@ if __name__ == '__main__':
 
     reg=re.compile('^[a-zA-Z]+$') #only take symbols with alphabets 
     save_list = [s for s in save_list if reg.match(s)]
+
+    save_list.append('^DJI')
 
     to_save = ''
     for i in save_list:

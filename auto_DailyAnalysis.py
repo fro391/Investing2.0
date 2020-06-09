@@ -92,6 +92,12 @@ def symbol_downloader(symbol, directory, days=600, days_ago=0):
         raise SystemExit(e)
         
 if __name__ == '__main__':
+    
+    #Delete files in Directory
+    directory = './data_nasdaq/'
+    filelist = [ f for f in os.listdir(directory) if f.endswith(".csv") ]
+    for f in filelist:
+        os.remove(os.path.join(directory, f))
 
     #start timer
     start = timeit.default_timer()
