@@ -27,7 +27,7 @@ def symbol_downloader_intraday (symbol, directory, days=30, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
-    url = 'https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?period1='+str(UnixTime-86400*(days+days_ago))+'&period2='+str(UnixTime-86400*days_ago)+'&interval=5m&indicators=quote%7Csma~60&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-CA&region=CA&corsDomain=ca.finance.yahoo.com'
+    url = 'https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?period1='+str(UnixTime-86400*(days+days_ago))+'&period2='+str(UnixTime-86400*days_ago)+'&interval=5m&indicators=quote%7Csma~60%7Cmfi~8&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-CA&region=CA&corsDomain=ca.finance.yahoo.com'
     #proxies
     http_proxy  = ''
     https_proxy = ''
@@ -49,20 +49,37 @@ def symbol_downloader_intraday (symbol, directory, days=30, days_ago=0):
             print(resp.status_code)
         data = json.loads(resp.text)
         #json unpack
-        timestamp = data['chart']['result'][0]['timestamp']
-        timestamp = [datetime.datetime.fromtimestamp(x).strftime('%Y%m%d-%H%M') for x in timestamp]
+        timestamp_raw = data['chart']['result'][0]['timestamp']
+        timestamp = [datetime.datetime.fromtimestamp(x).strftime('%Y%m%d-%H%M') for x in timestamp_raw]
+       
         quote = data['chart']['result'][0]['indicators']['quote'][0]
         stock_df = pd.DataFrame(quote)
         #index is symbol and timestamp
         stock_df.index = [str(x) for x in timestamp]
-
+        
+        #ensure only active market minutes are downloaded
+        HourMinute = [datetime.datetime.fromtimestamp(x).strftime('%H%M') for x in timestamp_raw]
+        stock_df['HourMinute'] = HourMinute
+        stock_df['HourMinute'] = stock_df['HourMinute'].apply(pd.to_numeric)
+        stock_df = stock_df[(stock_df['HourMinute'] >= 930) & (stock_df['HourMinute'] < 1600)]
+        
+        #MFI(14)
+        MFI = data['chart']['result'][0]['indicators']['mfi'][0]['mfi']
+        stock_df['MFI'] = MFI
+        
         #moving averages
         stock_df['vol20'] = stock_df['volume'].rolling(window=20).mean()
         stock_df['sma5'] = stock_df['close'].rolling(window=5).mean()
         stock_df['sma8'] = stock_df['close'].rolling(window=8).mean()
         stock_df['sma13'] = stock_df['close'].rolling(window=13).mean()
         stock_df['sma21'] = stock_df['close'].rolling(window=21).mean()
-        stock_df = stock_df.dropna()
+
+        #MACD (9,12,26)
+        stock_df['ewm26'] = stock_df['close'].ewm(span=26,min_periods=0,adjust=False,ignore_na=False).mean()
+        stock_df['ewm12'] = stock_df['close'].ewm(span=12,min_periods=0,adjust=False,ignore_na=False).mean()
+        stock_df['MACD'] = stock_df['ewm12']-stock_df['ewm26']
+        stock_df['MACD_signal'] = stock_df['MACD'].ewm(span=9,min_periods=0,adjust=False,ignore_na=False).mean()
+        stock_df['MACD_pos_neg'] = stock_df['MACD']-stock_df['MACD_signal']
 
         #stock_df.drop(['close', 'high', 'low', 'open','volume','sma','vol20'], axis=1, inplace=True)
         stock_df = stock_df.dropna()
@@ -126,7 +143,7 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(2): #engulfing candel pattern looping through all available data 
+            for i in range(int((len(stock_df)*0.3))): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -152,6 +169,13 @@ if __name__ == '__main__':
                 sma8_2 = float(stock_df['sma8_x'].iloc[-(i+2)])
                 sma13_2 = float(stock_df['sma13_x'].iloc[-(i+2)])
                 sma21_2 = float(stock_df['sma21_x'].iloc[-(i+2)])  
+
+                #Money Flow Index
+                MFI = float(stock_df['MFI_x'].iloc[-i])
+
+    #             #MACD
+    #             MACD_pos_neg = float(stock_df['MACD_pos_neg_x'].iloc[-i])
+    #             MACD_pos_neg_1 = float(stock_df['MACD_pos_neg_x'].iloc[-(i+1)])
 
                 #moving average momentum indicators
                 s5 =  ((sma5-sma5_1)/sma5)*1000
@@ -184,13 +208,41 @@ if __name__ == '__main__':
                 if  stockPChange > abs(jonesPChange)*10\
                     and open0 < close0 \
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
-                    and close0 <= 5 and close0 >= 0.5 \
-                    and mktVlcty0 > 100000\
+                    and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0\
+                    and mktVlcty0 > 200000\
                     and volume0 >= 2\
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
                     to_send += '{} has 5m buy-in signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+
+                #plateau signal
+                if  s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+                    and s5 < 0 and s8 < 0 and s13 < 0 and s21 < 0 \
+                    and mktVlcty0 >100000 \
+                    and timeOfDay != '0930'\
+                    and date0 == tday_date:
+
+                    to_send += '{} has 5m plateau signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+
+                #MFI buy
+                if  MFI < 20 \
+                    and mktVlcty0 >200000 \
+                    and open0 < close0 \
+                    and timeOfDay != '0930'\
+                    and date0 == tday_date:
+
+                    to_send += '{} has 5m MFI buy signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+
+                #MFI sell
+                if  MFI > 80 \
+                    and open0 > close0 \
+                    and mktVlcty0 >200000 \
+                    and timeOfDay != '0930'\
+                    and date0 == tday_date:
+
+                    to_send += '{} has 5m MFI sell signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+
 
         except IndexError:
             print("{} has too few rows".format(f))
@@ -199,7 +251,7 @@ if __name__ == '__main__':
             print(traceback.format_exc())
             # or
             print(sys.exc_info()[2])
-
+        
 #Send email if there are buy-in signals
     if len(to_send) > 0:
         #email output
