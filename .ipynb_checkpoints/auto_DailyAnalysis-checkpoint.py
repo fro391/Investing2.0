@@ -141,7 +141,7 @@ if __name__ == '__main__':
             closeTdayAct =  float(stock_df['close_x'].iloc[-1])
             sma13Act = float(stock_df['sma13_x'].iloc[-1])
 
-            for i in range(3): #engulfing candel pattern looping through all available data 
+            for i in range(3):
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -225,8 +225,7 @@ if __name__ == '__main__':
                     and volume >= 2:
 
                     to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MACD signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
-
+                    to_send += '{} has MACD signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))  
 
         except IndexError:
             print("{} has too few rows".format(f))

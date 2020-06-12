@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
             stock_df = pd.merge(ticker_df, jones_df, left_index=True, right_index=True)
 
-            for i in range(int((len(stock_df)*0.3))): #engulfing candel pattern looping through all available data 
+            for i in range(2): #engulfing candel pattern looping through all available data 
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -216,23 +216,16 @@ if __name__ == '__main__':
 
                     to_send += '{} has 5m buy-in signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
-                #plateau signal
-                if  s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
-                    and s5 < 0 and s8 < 0 and s13 < 0 and s21 < 0 \
-                    and mktVlcty0 >100000 \
-                    and timeOfDay != '0930'\
-                    and date0 == tday_date:
 
-                    to_send += '{} has 5m plateau signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
-
-                #MFI buy
+                #MFI buy and plateau signal
                 if  MFI < 20 \
+                    and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+                    and s5 < 0 and s8 < 0 and s13 < 0 and s21 < 0 \
                     and mktVlcty0 >200000 \
-                    and open0 < close0 \
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m MFI buy signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m MFI buy and plateau signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
                 #MFI sell
                 if  MFI > 80 \
