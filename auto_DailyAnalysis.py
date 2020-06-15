@@ -22,11 +22,12 @@ import re
 #declare global lock object
 global lock
 lock = threading.Lock()
+
 def symbol_downloader(symbol, directory, days=600, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
-    url = 'https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?period1='+str(UnixTime-86400*(days+days_ago))+'&period2='+str(UnixTime-86400*days_ago)+'&interval=1d&indicators=quote%7Csma~60&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-CA&region=CA&corsDomain=ca.finance.yahoo.com'
+    url = 'https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?period1='+str(UnixTime-86400*(days+days_ago))+'&period2='+str(UnixTime-86400*days_ago)+'&interval=1d&indicators=quote%7Csma~60%7Cmfi~14&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-CA&region=CA&corsDomain=ca.finance.yahoo.com'
     #proxies
     http_proxy  = ''
     https_proxy = ''
@@ -56,6 +57,10 @@ def symbol_downloader(symbol, directory, days=600, days_ago=0):
         #index is symbol and timestamp
         stock_df.index = [str(x) for x in timestamp]
 
+        #MFI(14)
+        MFI = data['chart']['result'][0]['indicators']['mfi'][0]['mfi']
+        stock_df['MFI'] = MFI
+        
         #moving averages
         stock_df['sma60'] = sma60
         stock_df['vol20'] = stock_df['volume'].rolling(window=20).mean()
@@ -141,7 +146,7 @@ if __name__ == '__main__':
             closeTdayAct =  float(stock_df['close_x'].iloc[-1])
             sma13Act = float(stock_df['sma13_x'].iloc[-1])
 
-            for i in range(3):
+            for i in range(5):
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -193,6 +198,10 @@ if __name__ == '__main__':
 
                 volume = (float(stock_df['volume_x'].iloc[-i])+0.001)/(float(stock_df['vol20_x'].iloc[-i])+0.001)
 
+                #MFI values
+                MFI_0 = float(stock_df['MFI_x'].iloc[-i])
+
+                #Dow Jones values
                 j_open0 =  float(stock_df['open_y'].iloc[-i])
                 j_close0 =  float(stock_df['close_y'].iloc[-i])
 
@@ -225,7 +234,17 @@ if __name__ == '__main__':
                     and volume >= 2:
 
                     to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MACD signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))  
+                    to_send += '{} has MACD signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
+
+                #MFI logic
+                if  MFI_0 <= 20\
+                    and closeTday <= 10 and closeTday >= 0.5\
+                    and mktVlcty > 1000000\
+                    and volume >= 2:
+
+                    to_save += '{}\n'.format(f[:-4])
+                    to_send += '{} has MFI daily buy signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
+
 
         except IndexError:
             print("{} has too few rows".format(f))
@@ -236,6 +255,7 @@ if __name__ == '__main__':
             # or
             print(sys.exc_info()[2])
             pass
+    
 #replace intraday symbols file
     save_list = to_save.split('\n')
 

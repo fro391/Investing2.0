@@ -214,7 +214,7 @@ if __name__ == '__main__':
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m momentum signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m momentum signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
 
                 #MFI buy and plateau signal
@@ -225,7 +225,7 @@ if __name__ == '__main__':
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m MFI buy and plateau signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m MFI buy and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
                 #MFI sell
                 if  MFI > 80 \
@@ -235,7 +235,7 @@ if __name__ == '__main__':
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m MFI sell and plateau signal with high volume on {}, and is under $5. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m MFI sell and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
 
         except IndexError:
