@@ -54,31 +54,31 @@ def __validate_response(response, tagToCheck):
 	return quoteInfo
 
 def get_current_info(symbolList, columnsToRetrieve='*'):
-	"""Retrieves the latest data (15 minute delay) for the
-	provided symbols."""
-        try:
-            columns = ','.join(columnsToRetrieve)
-            symbols = __format_symbol_list(symbolList)
+    """Retrieves the latest data (15 minute delay) for the
+    provided symbols."""
+    try:
+        columns = ','.join(columnsToRetrieve)
+        symbols = __format_symbol_list(symbolList)
 
-            yql = 'select %s from %s where symbol in (%s)' \
-                  %(columns, FINANCE_TABLES['quotes'], symbols)
-            response = executeYQLQuery(yql)
-            V = __validate_response(response, 'quote')
-            #each V has n number of responses
-            for item in V:
-                #only working with items with a name
-                if item['Name']is not None:
-                    #preparing variable to be written to file
-                    ToWrite = (str(item['symbol'])+","+ str(item['LastTradeDate']).replace(',','') +","+ str(item['LastTradePriceOnly'])+","+ str(item['PercentChange'])+","+ str(item['Volume'])+","+ str(item['AverageDailyVolume'])+","+ str(item['ChangeFromFiftydayMovingAverage'])+","+ str(item['ChangeFromTwoHundreddayMovingAverage'])+","+ str(item['MarketCapitalization'])+","+ str(item['EarningsShare'])+","+ str(item['PriceSales'])+","+ str(item['YearHigh'])+","+ str(item['YearLow'])+'\n')
-                    lock.acquire()
-                    try:
-                        myfile.write(str(ToWrite))
-                    finally:
-                        lock.release()
-        except Exception as ex:
-            template = "An exception of type {0} occured. Arguments:\n{1!r}"
-            message = template.format(type(ex).__name__, ex.args)
-            print message
+        yql = 'select %s from %s where symbol in (%s)' \
+              %(columns, FINANCE_TABLES['quotes'], symbols)
+        response = executeYQLQuery(yql)
+        V = __validate_response(response, 'quote')
+        #each V has n number of responses
+        for item in V:
+            #only working with items with a name
+            if item['Name']is not None:
+                #preparing variable to be written to file
+                ToWrite = (str(item['symbol'])+","+ str(item['LastTradeDate']).replace(',','') +","+ str(item['LastTradePriceOnly'])+","+ str(item['PercentChange'])+","+ str(item['Volume'])+","+ str(item['AverageDailyVolume'])+","+ str(item['ChangeFromFiftydayMovingAverage'])+","+ str(item['ChangeFromTwoHundreddayMovingAverage'])+","+ str(item['MarketCapitalization'])+","+ str(item['EarningsShare'])+","+ str(item['PriceSales'])+","+ str(item['YearHigh'])+","+ str(item['YearLow'])+'\n')
+                lock.acquire()
+                try:
+                    myfile.write(str(ToWrite))
+                finally:
+                    lock.release()
+    except Exception as ex:
+        template = "An exception of type {0} occured. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        print (message)
 
 start = timeit.default_timer()
 
@@ -86,7 +86,7 @@ start = timeit.default_timer()
 with open('data\keystats'+strftime("%Y-%m-%d", gmtime())+'.csv', 'w+') as myfile:
     myfile.write('Ticker,LastTradeDate,LastTradePriceOnly,PercentChange,Volume,AvgVol,50sma%,200sma%,MktCap,EPS,PriceSales,YearHigh,YearLow'+'\n')
 
-with open("symbolsAlt.txt") as symbolfile:
+with open("symbols_nasdaq.txt") as symbolfile:
     symbolslistR = symbolfile.read()
     symbolslist = symbolslistR.split('\n')
 
@@ -111,4 +111,4 @@ with open('data\keystats'+strftime("%Y-%m-%d", gmtime())+'.csv', 'a') as myfile:
         b.join()
 
 stop = timeit.default_timer()
-print "start= ",start,"stop= ",stop
+print ("start= ",start,"stop= ",stop)

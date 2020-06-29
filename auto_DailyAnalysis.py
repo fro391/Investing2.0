@@ -23,7 +23,7 @@ import re
 global lock
 lock = threading.Lock()
 
-def symbol_downloader(symbol, directory, days=600, days_ago=0):
+def symbol_downloader(symbol, directory, days=2000, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
@@ -216,12 +216,12 @@ if __name__ == '__main__':
                     and closeTday > sma89 \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
-                    and closeTday <= 10 and closeTday >= 0.5 \
+                    and closeTday <= 30 and closeTday >= 0.5 \
                     and mktVlcty > 1000000\
                     and volume >= 2:
 
                     to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has uncle"s pattern with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))
+                    to_send += '{} has uncle"s pattern with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))
 
                 #MACD logic
                 if  closeTdayAct > sma13Act\
@@ -229,21 +229,21 @@ if __name__ == '__main__':
                     and MACD_1 < MACD_signal_1 and MACD > MACD_signal \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
-                    and closeTday <= 10 and closeTday >= 0.5\
+                    and closeTday <= 30 and closeTday >= 0.5\
                     and mktVlcty > 1000000\
                     and volume >= 2:
 
                     to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MACD signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
+                    to_send += '{} has MACD signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
 
                 #MFI logic
                 if  MFI_0 <= 20\
-                    and closeTday <= 10 and closeTday >= 0.5\
+                    and closeTday <= 30 and closeTday >= 0.5\
                     and mktVlcty > 1000000\
                     and volume >= 2:
 
                     to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MFI daily buy signal with high volume on {}, and is under $10 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
+                    to_send += '{} has MFI daily buy signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
 
 
         except IndexError:

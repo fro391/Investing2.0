@@ -204,17 +204,17 @@ if __name__ == '__main__':
                 date0 = stock_df['Unnamed: 0_x'].iloc[-i][:8]
                 tday_date = str(datetime.datetime.today().strftime('%Y%m%d'))
 
-                #core logic
-                if  stockPChange > abs(jonesPChange)*5\
-                    and open0 < close0 \
-                    and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
-                    and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0\
-                    and mktVlcty0 > 200000\
-                    and volume0 >= 2\
-                    and timeOfDay != '0930'\
-                    and date0 == tday_date:
+#                 #core logic
+#                 if  stockPChange > abs(jonesPChange)*5\
+#                     and open0 < close0 \
+#                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+#                     and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0\
+#                     and mktVlcty0 > 200000\
+#                     and volume0 >= 2\
+#                     and timeOfDay != '0930'\
+#                     and date0 == tday_date:
 
-                    to_send += '{} has 5m momentum signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+#                     to_send += '{} has 5m momentum signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
 
                 #MFI buy and plateau signal
@@ -227,15 +227,15 @@ if __name__ == '__main__':
 
                     to_send += '{} has 5m MFI buy and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
-                #MFI sell
-                if  MFI > 80 \
-                    and s5 <= z5 and s8 <= z8 and s13 <= z13 and s21 <= z21\
-                    and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0 \
-                    and mktVlcty0 > 100000 \
-                    and timeOfDay != '0930'\
-                    and date0 == tday_date:
+#                 #MFI sell
+#                 if  MFI > 80 \
+#                     and s5 <= z5 and s8 <= z8 and s13 <= z13 and s21 <= z21\
+#                     and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0 \
+#                     and mktVlcty0 > 100000 \
+#                     and timeOfDay != '0930'\
+#                     and date0 == tday_date:
 
-                    to_send += '{} has 5m MFI sell and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+#                     to_send += '{} has 5m MFI sell and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
 
         except IndexError:
