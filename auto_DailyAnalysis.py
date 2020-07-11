@@ -210,9 +210,10 @@ if __name__ == '__main__':
 
                 #core buy-in logic
                 if  closeTdayAct > sma13Act\
-                    and stockPChange > abs(jonesPChange)*3\
+                    and stockPChange > abs(jonesPChange)*2\
                     and openTday < closeTday \
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+		    and closeTday > sma5 \
                     and closeTday > sma89 \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
@@ -235,16 +236,6 @@ if __name__ == '__main__':
 
                     to_save += '{}\n'.format(f[:-4])
                     to_send += '{} has MACD signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
-
-                #MFI logic
-                if  MFI_0 <= 20\
-                    and closeTday <= 30 and closeTday >= 0.5\
-                    and mktVlcty > 1000000\
-                    and volume >= 2:
-
-                    to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MFI daily buy signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
-
 
         except IndexError:
             print("{} has too few rows".format(f))

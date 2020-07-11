@@ -2,16 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a25f91bc-6edb-4f1d-9b17-79027240c5bd" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Investing2.0.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Investing2.0.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Test-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Test-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/auto_DailyAnalysis-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/auto_DailyAnalysis-checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Intraday_Analysis/.ipynb_checkpoints/IntraDay-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/Intraday_Analysis/.ipynb_checkpoints/IntraDay-checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Intraday_Analysis/.ipynb_checkpoints/Intra_day_test-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Intraday_Analysis/.ipynb_checkpoints/Intra_day_test-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Intraday_Analysis/IntraDay.py" beforeDir="false" afterPath="$PROJECT_DIR$/Intraday_Analysis/IntraDay.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Intraday_Analysis/Intra_day_test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Intraday_Analysis/Intra_day_test.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KeyStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyStats.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Test.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auto_DailyAnalysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/auto_DailyAnalysis.py" afterDir="false" />
     </list>
@@ -32,6 +25,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.KeyStats">
@@ -39,6 +34,9 @@
       <module name="Investing2.0" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -96,9 +94,9 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.KeyStats" />
       <item itemvalue="Python.symbol_download" />
       <item itemvalue="Python.technical_download" />
-      <item itemvalue="Python.KeyStats" />
     </list>
     <recent_temporary>
       <list>
