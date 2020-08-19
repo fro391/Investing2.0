@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a25f91bc-6edb-4f1d-9b17-79027240c5bd" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Test-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Test-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/auto_DailyAnalysis-checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/auto_DailyAnalysis-checkpoint.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Intraday_Analysis/IntraDay.py" beforeDir="false" afterPath="$PROJECT_DIR$/Intraday_Analysis/IntraDay.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Test.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Test.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auto_DailyAnalysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/auto_DailyAnalysis.py" afterDir="false" />

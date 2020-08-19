@@ -23,7 +23,7 @@ import re
 global lock
 lock = threading.Lock()
 
-def symbol_downloader(symbol, directory, days=600, days_ago=0):
+def symbol_downloader(symbol, directory, days=500, days_ago=0):
     dt = datetime.datetime.now()
     UnixTime = int(time.mktime(dt.timetuple()))
     #web variables
@@ -52,7 +52,7 @@ def symbol_downloader(symbol, directory, days=600, days_ago=0):
         timestamp = data['chart']['result'][0]['timestamp']
         timestamp = [datetime.datetime.fromtimestamp(x).strftime('%Y%m%d') for x in timestamp]
         quote = data['chart']['result'][0]['indicators']['quote'][0]
-        sma60 = data['chart']['result'][0]['indicators']['sma'][0]['sma']
+        #sma60 = data['chart']['result'][0]['indicators']['sma'][0]['sma']
         stock_df = pd.DataFrame(quote)
         #index is symbol and timestamp
         stock_df.index = [str(x) for x in timestamp]
@@ -62,7 +62,6 @@ def symbol_downloader(symbol, directory, days=600, days_ago=0):
         stock_df['MFI'] = MFI
         
         #moving averages
-        stock_df['sma60'] = sma60
         stock_df['vol20'] = stock_df['volume'].rolling(window=20).mean()
         stock_df['sma5'] = stock_df['close'].rolling(window=5).mean()
         stock_df['sma8'] = stock_df['close'].rolling(window=8).mean()
@@ -146,7 +145,7 @@ if __name__ == '__main__':
             closeTdayAct =  float(stock_df['close_x'].iloc[-1])
             sma13Act = float(stock_df['sma13_x'].iloc[-1])
 
-            for i in range(5):
+            for i in range(3):
 
                 window = 59 #number of days back from today to look at for slope
 
@@ -210,18 +209,20 @@ if __name__ == '__main__':
 
                 #core buy-in logic
                 if  closeTdayAct > sma13Act\
-                    and stockPChange > abs(jonesPChange)*3\
+                    and stockPChange > abs(jonesPChange)*2\
                     and openTday < closeTday \
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
+                    and closeTday > sma5 \
                     and closeTday > sma89 \
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
                     and closeTday <= 30 and closeTday >= 0.5 \
-                    and mktVlcty > 1000000\
-                    and volume >= 2:
+                    and mktVlcty > 5000000\
+                    and volume >= 1.5:
 
-                    to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has uncle"s pattern with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))
+                    if i = 1:
+                        to_save += '{}\n'.format(f[:-4])
+                        to_send += '{} has uncle"s pattern with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))
 
                 #MACD logic
                 if  closeTdayAct > sma13Act\
@@ -230,21 +231,12 @@ if __name__ == '__main__':
                     and sma34 < sma144 and sma55 < sma144 and sma89<sma144\
                     and sma144 < sma233\
                     and closeTday <= 30 and closeTday >= 0.5\
-                    and mktVlcty > 1000000\
-                    and volume >= 2:
-
-                    to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MACD signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
-
-                #MFI logic
-                if  MFI_0 <= 20\
-                    and closeTday <= 30 and closeTday >= 0.5\
-                    and mktVlcty > 1000000\
-                    and volume >= 2:
-
-                    to_save += '{}\n'.format(f[:-4])
-                    to_send += '{} has MFI daily buy signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
-
+                    and mktVlcty > 5000000\
+                    and volume >= 1.5:
+                    
+                    if i = 1:
+                        to_save += '{}\n'.format(f[:-4])
+                        to_send += '{} has MACD signal with high volume on {}, and is under $30 \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]))                
 
         except IndexError:
             print("{} has too few rows".format(f))

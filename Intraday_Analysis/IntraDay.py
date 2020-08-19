@@ -133,6 +133,7 @@ if __name__ == '__main__':
 #IntraDay Buy-In signal @5m candle sticks
     gc.collect()
     to_send = ''
+    to_send_dayTrade = ''
     directory = './data5m/'
     # get list with filenames in folder and throw away all non ncsv
     files = [f for f in os.listdir(directory) if f.endswith('.csv')]
@@ -173,9 +174,9 @@ if __name__ == '__main__':
                 #Money Flow Index
                 MFI = float(stock_df['MFI_x'].iloc[-i])
 
-    #             #MACD
-    #             MACD_pos_neg = float(stock_df['MACD_pos_neg_x'].iloc[-i])
-    #             MACD_pos_neg_1 = float(stock_df['MACD_pos_neg_x'].iloc[-(i+1)])
+                #MACD
+                MACD_pos_neg = float(stock_df['MACD_pos_neg_x'].iloc[-i])
+                MACD_pos_neg_1 = float(stock_df['MACD_pos_neg_x'].iloc[-(i+1)])
 
                 #moving average momentum indicators
                 s5 =  ((sma5-sma5_1)/sma5)*1000
@@ -207,6 +208,7 @@ if __name__ == '__main__':
                 #core logic
                 if  stockPChange > abs(jonesPChange)*5\
                     and open0 < close0 \
+		    and MACD_pos_neg > 0 and MACD_pos_neg_1 < 0\
                     and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
                     and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0\
                     and mktVlcty0 > 200000\
@@ -214,29 +216,17 @@ if __name__ == '__main__':
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m momentum signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
+                    to_send += '{} has 5m momentum signal and MACD signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
-
-                #MFI buy and plateau signal
-                if  MFI < 20 \
-                    and s5 >= z5 and s8 >= z8 and s13 >= z13 and s21 >= z21\
-                    and s5 < 0 and s8 < 0 and s13 < 0 and s21 < 0 \
-                    and mktVlcty0 > 200000 \
+                #day trade sell alert core logic
+                if  stockPChange < abs(jonesPChange)*5\
+                    and open0 > close0 \
+                    and s5 < z5 and s8 < z8 and s13 < z13 and s21 < z21\
+                    and MFI < 20\
                     and timeOfDay != '0930'\
                     and date0 == tday_date:
 
-                    to_send += '{} has 5m MFI buy and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
-
-                #MFI sell
-                if MFI > 80 \
-                    and s5 <= z5 and s8 <= z8 and s13 <= z13 and s21 <= z21\
-                    and s5 > 0 and s8 > 0 and s13 > 0 and s21 > 0 \
-                    and mktVlcty0 > 100000 \
-                    and timeOfDay != '0930'\
-                    and date0 == tday_date:
-
-                    to_send += '{} has 5m MFI sell and plateau signal with high volume on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
-
+                    to_send_dayTrade += '{} has Day_Trade cover signal on {}. Close price: {} \n'.format(f[:-4],(stock_df['Unnamed: 0_x'].iloc[-i]),close0)
 
         except IndexError:
             print("{} has too few rows".format(f))
@@ -246,7 +236,7 @@ if __name__ == '__main__':
             # or
             print(sys.exc_info()[2])
         
-#Send email if there are buy-in signals
+    #Send email if there are buy-in signals
     if len(to_send) > 0:
         #email output
         with open('C:\\Users\\Richard\\Desktop\\Python\\hotmail.txt', 'rb') as f:
@@ -272,3 +262,30 @@ if __name__ == '__main__':
                 raise
     else: 
         print('No buy-in signals')
+
+    #Day trade email alerts
+    if lento_send_dayTrade > 0:
+        #email output
+        with open('C:\\Users\\Richard\\Desktop\\Python\\hotmail.txt', 'rb') as f:
+            email_list = str(f.read()).split(',')
+            emailAddress = email_list[0][2:]
+            password = email_list[1][:-1]
+
+            msg = MIMEText(to_send)
+            recipients = [emailAddress, 'michelleusdenski@gmail.com']
+            msg['Subject'] = '%s stock analysis - Day Trade cover alert - %s' % (str(datetime.datetime.today().strftime('%Y%m%d-%H%M')), str(len(to_send.split('\n'))-1))
+            msg['From'] = emailAddress
+            msg['To'] = ', '.join(recipients)
+            try:
+                s = smtplib.SMTP('smtp-mail.outlook.com', 25)
+                s.ehlo()  # Hostname to send for this command defaults to the fully qualified domain name of the local host.
+                s.starttls()  # Puts connection to SMTP server in TLS mode
+                s.ehlo()
+                s.login(emailAddress, password)
+                s.sendmail(emailAddress, recipients, msg.as_string())
+                s.quit()
+                print ('email sent to: %s' % emailAddress)
+            except:
+                raise
+    else: 
+        print('No day-trade alerts')
